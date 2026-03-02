@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>古月AI智能体·双语软膜灯箱灵感库 AIGC</title>
+<title>古月AI智能体·彩色软膜灯箱灵感库</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
@@ -33,16 +33,23 @@ body { font-family: 'Inter', "PingFang SC", "Microsoft YaHei", sans-serif; backg
 
 <header class="max-w-4xl mx-auto px-6 pt-12 text-center">
 <div class="inline-block px-4 py-1.5 mb-4 rounded-full bg-pink-50 text-pink-600 text-xs font-bold tracking-widest uppercase">Premium Design Assets</div>
-<h2 class="text-4xl font-extrabold mb-6 tracking-tight text-slate-900">古月AI智能体·双语软膜灯箱灵感库</h2>
+<h2 class="text-4xl font-extrabold mb-6 tracking-tight text-slate-900">古月AI智能体·彩色软膜灯箱灵感库</h2>
 
-<div class="glass-card rounded-3xl p-6 shadow-xl mb-12">
-<div class="flex flex-col md:flex-row gap-4">
+<div class="glass-card rounded-3xl p-6 shadow-xl mb-6">
+<div class="flex flex-col md:flex-row gap-4 mb-3">
 <input type="text" id="industryInput" placeholder="请输入店铺行业（如：日式拉面、精品美容院...）" 
     class="flex-grow bg-white border border-slate-200 rounded-2xl px-6 py-4 text-lg focus:ring-2 focus:ring-pink-500 outline-none transition-all">
-<button onclick="handleGenerate()" id="genBtn" class="bg-pink-500 hover:bg-pink-600 text-white px-10 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-    <i data-lucide="zap"></i> 生成双语提案
-</button>
 </div>
+<div class="flex flex-col md:flex-row gap-4 mb-3">
+<select id="environmentSelect" class="bg-white border border-slate-200 rounded-2xl px-6 py-4 text-lg focus:ring-2 focus:ring-pink-500 outline-none transition-all">
+    <option value="白天">白天</option>
+    <option value="夜晚">夜晚</option>
+</select>
+<input type="number" id="numPrompts" min="1" max="50" value="10" class="bg-white border border-slate-200 rounded-2xl px-6 py-4 text-lg focus:ring-2 focus:ring-pink-500 outline-none transition-all" placeholder="生成条数">
+</div>
+<button onclick="handleGenerate()" id="genBtn" class="bg-pink-500 hover:bg-pink-600 text-white px-10 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+    <i data-lucide="zap"></i> 生成彩色提案
+</button>
 </div>
 </header>
 
@@ -67,74 +74,76 @@ const variants = [
     { zh: "实验室科技极白光", en: "Laboratory tech pure white light" }
 ];
 
-const adjectives = [
-    "明亮吸睛", "柔光处理", "极致极简", "赛博光感", "高级灰调", 
-    "金属质感", "高饱和度", "奶油色调", "悬浮3D效果", "实验室白光"
-];
+const adjectives = ["明亮吸睛","柔光处理","极致极简","赛博光感","高级灰调","金属质感","高饱和度","奶油色调","悬浮3D效果","实验室白光"];
+const lightEffects = ["发光","霓虹光效","柔光","背光","悬浮光影","渐变光","彩色光晕"];
+const colors = ["彩色渐变","单色明亮","奶油色调","高饱和度","莫兰迪色彩","粉紫渐变","蓝黄渐变"];
 
-// 随机打乱数组
-function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
-}
+function shuffle(array){ return array.sort(() => Math.random() - 0.5); }
 
 function handleGenerate() {
     const industry = document.getElementById("industryInput").value.trim();
-    const resultWrap = document.getElementById("resultWrap");
+    const env = document.getElementById("environmentSelect").value;
+    let num = parseInt(document.getElementById("numPrompts").value);
     if (!industry) return alert("请输入行业名称");
+    if (!num || num < 1) num = 10;
+    if (num > 50) num = 50;
 
-    resultWrap.innerHTML = "";
     promptsData = [];
+    document.getElementById("resultWrap").innerHTML = "";
 
-    // 打乱数组保证每组独一无二
     const shuffledVariants = shuffle([...variants]);
     const shuffledAdjs = shuffle([...adjectives]);
+    const shuffledLights = shuffle([...lightEffects]);
+    const shuffledColors = shuffle([...colors]);
 
-    for (let i = 0; i < 10; i++) { 
+    for (let i=0;i<num;i++){
         const variant = shuffledVariants[i % shuffledVariants.length];
         const adj = shuffledAdjs[i % shuffledAdjs.length];
+        const light = shuffledLights[i % shuffledLights.length];
+        const color = shuffledColors[i % shuffledColors.length];
 
-        const zhPrompt = `白天自然光，门头正立面，完整展示，正面平视视角，无透视畸变，软膜灯箱门头，整体发光、视觉统一、${adj}，${industry}店铺门头，软膜灯箱、无边框型材、UV软膜、通体发光灯箱，品牌店名+${variant.zh}，现代清晰字体，8K高清，商业写实效果图。`;
+        const zhPrompt = `${env}环境，门头正立面，完整展示，正面平视，无透视畸变，软膜灯箱门头，整体发光、视觉统一、${adj}、${light}、${color}，${industry}店铺门头，软膜灯箱、无边框型材、UV软膜、通体发光灯箱，品牌店名+${variant.zh}，现代清晰字体，8K高清，商业写实效果图。`;
 
-        const enPrompt = `Daylight, Storefront facade, front view, eye-level, NO distortion, backlit soft film light box sign, ${industry} store, ultra-bright uniform lighting, ${adj}, UV soft film texture, frameless aluminum profile, brand logo + ${variant.en}, sharp modern fonts, 8k, photorealistic.`;
+        const enPrompt = `${env} environment, Storefront facade, front view, eye-level, NO distortion, backlit soft film light box sign, ${industry} store, ultra-bright uniform lighting, ${adj}, ${light}, ${color}, UV soft film texture, frameless aluminum profile, brand logo + ${variant.en}, sharp modern fonts, 8k, photorealistic.`;
 
-        promptsData.push({ zh: zhPrompt, en: enPrompt });
+        promptsData.push({zh:zhPrompt,en:enPrompt});
 
-        const card = document.createElement('div');
+        const card = document.createElement("div");
         card.className = "prompt-card glass-card rounded-2xl overflow-hidden flex flex-col md:flex-row";
         card.innerHTML = `
-            <div class="flex-1 p-6 border-b md:border-b-0 md:border-r border-slate-100">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="tag-zh text-[10px] font-bold px-2 py-0.5 rounded uppercase">CN / 中文版</span>
-                    <button onclick="copyText('${zhPrompt.replace(/'/g,"\\'")}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                </div>
-                <p class="text-sm text-slate-600 leading-relaxed">${zhPrompt}</p>
+        <div class="flex-1 p-6 border-b md:border-b-0 md:border-r border-slate-100">
+            <div class="flex justify-between items-center mb-3">
+                <span class="tag-zh text-[10px] font-bold px-2 py-0.5 rounded uppercase">CN / 中文版</span>
+                <button onclick="copyText('${zhPrompt.replace(/'/g,"\\'")}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
             </div>
-            <div class="flex-1 p-6 bg-slate-50/50">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="tag-en text-[10px] font-bold px-2 py-0.5 rounded uppercase">EN / AI Engine</span>
-                    <button onclick="copyText('${enPrompt.replace(/'/g, "\\'")}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                </div>
-                <p class="text-sm text-slate-500 font-mono leading-relaxed">${enPrompt}</p>
+            <p class="text-sm text-slate-600 leading-relaxed">${zhPrompt}</p>
+        </div>
+        <div class="flex-1 p-6 bg-slate-50/50">
+            <div class="flex justify-between items-center mb-3">
+                <span class="tag-en text-[10px] font-bold px-2 py-0.5 rounded uppercase">EN / AI Engine</span>
+                <button onclick="copyText('${enPrompt.replace(/'/g,"\\'")}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
             </div>
+            <p class="text-sm text-slate-500 font-mono leading-relaxed">${enPrompt}</p>
+        </div>
         `;
-        resultWrap.appendChild(card);
+        document.getElementById("resultWrap").appendChild(card);
     }
     lucide.createIcons();
 }
 
-function copyText(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-        const icon = btn.innerHTML;
-        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-green-500"></i>`;
+function copyText(text, btn){
+    navigator.clipboard.writeText(text).then(()=>{
+        const icon=btn.innerHTML;
+        btn.innerHTML=`<i data-lucide="check" class="w-4 h-4 text-green-500"></i>`;
         lucide.createIcons();
-        setTimeout(() => { btn.innerHTML = icon; lucide.createIcons(); }, 2000);
+        setTimeout(()=>{btn.innerHTML=icon;lucide.createIcons();},2000);
     });
 }
 
-function copyAll(type) {
-    if (promptsData.length === 0) return alert("请先生成提示词");
-    const text = promptsData.map(p => p[type]).join("\n\n");
-    navigator.clipboard.writeText(text).then(() => alert(`✅ 已一键复制全部 10 组${type === 'zh' ? '中文提示词' : '英文提示词'}`));
+function copyAll(type){
+    if(promptsData.length===0)return alert("请先生成提示词");
+    const text=promptsData.map(p=>p[type]).join("\n\n");
+    navigator.clipboard.writeText(text).then(()=>alert(`✅ 已一键复制全部 ${promptsData.length} 组${type==='zh'?'中文提示词':'英文提示词'}`));
 }
 </script>
 </body>
