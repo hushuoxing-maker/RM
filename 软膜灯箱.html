@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>古月AI智能体·双语 软膜灯箱灵感库 AIGC</title>
+    <title>古月AI智能体·双语软膜灯箱灵感库 AIGC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -33,7 +33,7 @@
 
     <header class="max-w-4xl mx-auto px-6 pt-12 text-center">
         <div class="inline-block px-4 py-1.5 mb-4 rounded-full bg-pink-50 text-pink-600 text-xs font-bold tracking-widest uppercase">Premium Design Assets</div>
-        <h2 class="text-4xl font-extrabold mb-6 tracking-tight text-slate-900">古月AI智能体·双语 软膜灯箱灵感库</h2>
+        <h2 class="text-4xl font-extrabold mb-6 tracking-tight text-slate-900">古月AI智能体·双语软膜灯箱灵感库</h2>
         
         <div class="glass-card rounded-3xl p-6 shadow-xl mb-12">
             <div class="flex flex-col md:flex-row gap-4">
@@ -47,8 +47,7 @@
     </header>
 
     <section class="max-w-6xl mx-auto px-6">
-        <div id="resultWrap" class="grid grid-cols-1 gap-6">
-            </div>
+        <div id="resultWrap" class="grid grid-cols-1 gap-6"></div>
     </section>
 
     <script>
@@ -68,6 +67,11 @@
             { zh: "实验室科技极白光", en: "Laboratory tech pure white light" }
         ];
 
+        const adjectives = [
+            "明亮吸睛", "柔光处理", "极致极简", "赛博光感", "高级灰调", 
+            "金属质感", "高饱和度", "奶油色调", "悬浮3D效果", "实验室白光"
+        ];
+
         function handleGenerate() {
             const industry = document.getElementById("industryInput").value.trim();
             const resultWrap = document.getElementById("resultWrap");
@@ -76,10 +80,14 @@
             resultWrap.innerHTML = "";
             promptsData = [];
 
-            variants.forEach((v, i) => {
-                const zhPrompt = `白天自然光，门头正立面，完整展示，正面平视视角，无透视畸变，软膜灯箱门头，整体发光、视觉统一、明亮吸睛，${industry}店铺门头，软膜灯箱、无边框型材、UV软膜、通体发光灯箱，品牌店名+${v.zh}，现代清晰字体，8K高清，商业写实效果图。`;
-                const enPrompt = `Daylight, Storefront facade, front view, eye-level, NO distortion, backlit soft film light box sign, ${industry} store, ultra-bright uniform lighting, UV soft film texture, frameless aluminum profile, brand logo + ${v.en}, sharp modern fonts, 8k, photorealistic.`;
-                
+            for (let i = 0; i < 10; i++) { // 生成10组
+                const variant = variants[Math.floor(Math.random() * variants.length)];
+                const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+
+                const zhPrompt = `白天自然光，门头正立面，完整展示，正面平视视角，无透视畸变，软膜灯箱门头，整体发光、视觉统一、${adj}，${industry}店铺门头，软膜灯箱、无边框型材、UV软膜、通体发光灯箱，品牌店名+${variant.zh}，现代清晰字体，8K高清，商业写实效果图。`;
+
+                const enPrompt = `Daylight, Storefront facade, front view, eye-level, NO distortion, backlit soft film light box sign, ${industry} store, ultra-bright uniform lighting, ${adj}, UV soft film texture, frameless aluminum profile, brand logo + ${variant.en}, sharp modern fonts, 8k, photorealistic.`;
+
                 promptsData.push({ zh: zhPrompt, en: enPrompt });
 
                 const card = document.createElement('div');
@@ -88,7 +96,7 @@
                     <div class="flex-1 p-6 border-b md:border-b-0 md:border-r border-slate-100">
                         <div class="flex justify-between items-center mb-3">
                             <span class="tag-zh text-[10px] font-bold px-2 py-0.5 rounded uppercase">CN / 中文版</span>
-                            <button onclick="copyText('${zhPrompt}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <button onclick="copyText('${zhPrompt.replace(/'/g,"\\'")}', this)" class="text-slate-400 hover:text-pink-500 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
                         <p class="text-sm text-slate-600 leading-relaxed">${zhPrompt}</p>
                     </div>
@@ -101,7 +109,7 @@
                     </div>
                 `;
                 resultWrap.appendChild(card);
-            });
+            }
             lucide.createIcons();
         }
 
@@ -115,11 +123,10 @@
         }
 
         function copyAll(type) {
+            if (promptsData.length === 0) return alert("请先生成提示词");
             const text = promptsData.map(p => p[type]).join("\n\n");
             navigator.clipboard.writeText(text).then(() => alert(`✅ 已一键复制全部 10 组${type === 'zh' ? '中文提示词' : '英文提示词'}`));
         }
     </script>
 </body>
 </html>
-
-
